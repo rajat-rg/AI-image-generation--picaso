@@ -15,8 +15,29 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const generateImage =() =>{
+  const generateImage = async() =>{
+    if(form.prompt){
+      try {
+        setGeneratingImg(true);
+        const response = await fetch('http://localhost:8080/api/v1/picaso',{
+          method: 'POST',
+          headers:{
+            'Content-Type':'application/json',
+          },
+          body: JSON.stringify({ prompt: form.prommpt }),
+        })
+          const data = await response.json();
 
+          setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}`})
+
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setGeneratingImg(false);
+      }
+    } else{
+      alert('Please enter a prompt');
+    }
   }
 
   const handleSubmit = () => {};
@@ -53,7 +74,7 @@ const CreatePost = () => {
           <FormField
             labelName="Prompt"
             type="text"
-            name="name"
+            name="prompt"
             placeholder="A modern, sleek Cadillac drives along the Gardiner expressway with downtown Toronto in the background, with a lens flare, 50mm photography"
             value={form.prompt}
             handleChange={handleChange}
